@@ -16,6 +16,7 @@ public class ProgressiveMobs {
 
 	//public static Achievement progressStoneSword;
 	public static boolean forceAchievements;
+	public static double checkRange;
 	
 	
 	@Instance(Reference.MOD_ID)
@@ -27,9 +28,13 @@ public class ProgressiveMobs {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		
-		Property forceAchievementsProperty = config.get("Progressive Mobs", "force Achievement unlock", true);
+		Property forceAchievementsProperty = config.get("Progressive Mobs", "Force Achievement unlock", true);
 		forceAchievementsProperty.comment = "Unlocking Achievements even when you don't have the required sub-achievements";
 		forceAchievements = forceAchievementsProperty.getBoolean(true);
+		
+		Property checkRangeProperty = config.get("Progressive Mobs", "Check Range", 128.0);
+		checkRangeProperty.comment = "The range mobs will check for players to determine their scaling";
+		checkRange = forceAchievementsProperty.getDouble(128.0);
 		
 		config.save();
 	}

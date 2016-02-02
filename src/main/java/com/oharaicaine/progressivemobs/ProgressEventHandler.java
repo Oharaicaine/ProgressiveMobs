@@ -38,7 +38,7 @@ public class ProgressEventHandler {
 			 * Checks for players around the mobs
 			 */
 			if(event.entity instanceof EntityMob){
-				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(128.0, 32.0, 128.0), null);
+				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(ProgressiveMobs.checkRange, (ProgressiveMobs.checkRange*0.5), ProgressiveMobs.checkRange), null);
 				if(!list.isEmpty()){
 					for(int i=0; i < list.size(); i++){
 						if(list.get(i) instanceof EntityPlayer){
@@ -82,27 +82,27 @@ public class ProgressEventHandler {
 		return result;
 	}
 
-	private void progressiveSpawnHandler(EntityMob entity, float tier){
+	private void progressiveSpawnHandler(EntityMob entity, float scale){
 		if(!entity.getEntityData().getBoolean("boosted")){ 
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("pmhealth", (tier*0.3), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("pmhealth", (scale*0.3), 2));
 			entity.setHealth(entity.getMaxHealth());
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("pmdamage", (tier*0.2), 2));
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("pmspeed", (tier*0.03), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("pmdamage", (scale*0.2), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("pmspeed", (scale*0.03), 2));
 			
 			double range = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).getBaseValue();
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).setBaseValue(range+(tier*5));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).setBaseValue(range+(scale*5));
 			
 			if(entity instanceof EntityZombie)
-				entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.knockbackResistance).setBaseValue(tier*0.1);
+				entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.knockbackResistance).setBaseValue(scale*0.1);
 		
 			entity.getEntityData().setBoolean("boosted", true);
 		}
 	}
 	
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public void hitTest(LivingHurtEvent event){
 		if(event.entityLiving instanceof EntityPlayer){	
 			System.out.println("damaged "+event.ammount);
 		}
-	}	
+	}	*/
 }
