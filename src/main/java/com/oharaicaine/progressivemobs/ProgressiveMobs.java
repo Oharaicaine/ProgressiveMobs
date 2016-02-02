@@ -7,10 +7,10 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = "progressiveMobs", name = "Progressive Mobs", version = "0.1")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = "0.1")
 public class ProgressiveMobs {
 
-	@Instance("progressiveMobs")
+	@Instance(Reference.MOD_ID)
 	public static ProgressiveMobs instance;
 	
 	@EventHandler

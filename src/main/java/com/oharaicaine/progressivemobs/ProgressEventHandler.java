@@ -3,6 +3,8 @@ package com.oharaicaine.progressivemobs;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.javafx.scene.traversal.Hueristic2D;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -16,6 +18,7 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AchievementEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -59,11 +62,10 @@ public class ProgressEventHandler {
 	
 	private void progressiveSpawnHandler(EntityMob entity, float tier){
 		if(!entity.getEntityData().getBoolean("boosted")){ //return if already boosted
-			System.out.println("entity tier "+tier);
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("health", (tier*0.2), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("pmhealth", (tier*0.2), 2));
 			entity.setHealth(entity.getMaxHealth());
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("damage", (tier*0.1), 2));
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("speed", (tier*0.05), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("pmdamage", (tier*0.2), 2));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("pmspeed", (tier*0.08), 2));
 			entity.getEntityData().setBoolean("boosted", true);
 		}
 		//entity.getEntityData().setFloat("tier", tier);
@@ -81,18 +83,27 @@ public class ProgressEventHandler {
 			
 			if(ach.equals(AchievementList.mineWood)){
 				player.getEntityData().setFloat("AchievTier", playerTier += 1.0f);
+				player.addChatComponentMessage(new ChatComponentText("§4The enemies around you have become more powerfull!"));
 			}
 			if(ach.equals(AchievementList.openInventory)){
 				player.getEntityData().setFloat("AchievTier", playerTier += 1.0f);
+				player.addChatComponentMessage(new ChatComponentText("§4The enemies around you have become more powerfull!"));
 			}
-			if(ach.equals(AchievementList.killCow)){
+			if(ach.equals(AchievementList.buildPickaxe)){
 				player.getEntityData().setFloat("AchievTier", playerTier += 1.0f);
+				player.addChatComponentMessage(new ChatComponentText("§4The enemies around you have become more powerfull!"));
 			}
-			if(ach.equals(AchievementList.blazeRod)){
+			if(ach.equals(AchievementList.buildWorkBench)){
 				player.getEntityData().setFloat("AchievTier", playerTier += 1.0f);
+				player.addChatComponentMessage(new ChatComponentText("§4The enemies around you have become more powerfull!"));
 			}
-			System.out.println("player Tier "+player.getEntityData().getFloat("AchievTier"));
-			player.addChatComponentMessage(new ChatComponentText("§4The enemies around you have become more powerfull!"));
+		}
+	}
+	
+	@SubscribeEvent
+	public void hitTest(LivingHurtEvent event){
+		if(event.entityLiving instanceof EntityPlayer){
+			System.out.println("damaged "+event.ammount);
 		}
 	}
 }
