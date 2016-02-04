@@ -3,28 +3,19 @@ package com.oharaicaine.progressivemobs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.javafx.scene.traversal.Hueristic2D;
-
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.AchievementEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ProgressEventHandler {
@@ -38,7 +29,8 @@ public class ProgressEventHandler {
 			 * Checks for players around the mobs
 			 */
 			if(event.entity instanceof EntityMob){
-				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(ProgressiveMobs.checkRange, (ProgressiveMobs.checkRange*0.5), ProgressiveMobs.checkRange), null);
+				double range = ProgressiveMobs.checkRange;
+				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(range, (range*0.5), range), null);
 				if(!list.isEmpty()){
 					for(int i=0; i < list.size(); i++){
 						if(list.get(i) instanceof EntityPlayer){
@@ -48,7 +40,7 @@ public class ProgressEventHandler {
 					}	
 				}
 				/*
-				 * Calculates the difficulty tier
+				 * Calculates the difficulty tier based on all players around the spawning mob
 				 */
 				if(!players.isEmpty()){
 					float[] tier = new float[players.size()];
@@ -63,7 +55,7 @@ public class ProgressEventHandler {
 						result += tier[i];	
 					}
 					result = result/tier.length;
-					progressiveSpawnHandler((EntityMob) event.entity, result);
+					progressiveSpawnHandler((EntityMob)event.entity, result);
 				}
 			}
 		}
@@ -72,30 +64,40 @@ public class ProgressEventHandler {
 	private float obtainPlayerTier(EntityPlayerMP player) {
 		float result = 0;
 		StatisticsFile file = player.getStatFile(); 
-		if(file.hasAchievementUnlocked(AchievementList.acquireIron))result += 1.0f;
-		if(file.hasAchievementUnlocked(AchievementList.diamonds))result += 1.0f;
-		if(file.hasAchievementUnlocked(AchievementList.enchantments))result += 1.0f;
-		if(file.hasAchievementUnlocked(AchievementList.portal))result += 1.0f;
-		if(file.hasAchievementUnlocked(AchievementList.theEnd2))result += 1.0f;
-		if(file.hasAchievementUnlocked(AchievementList.killWither))result += 1.0f;
+		double scale = ProgressiveMobs.scale;
+		if(file.hasAchievementUnlocked(AchievementList.acquireIron))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.diamonds))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.enchantments))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.portal))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.theEnd2))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.killWither))result += scale;
 		
 		return result;
 	}
 
 	private void progressiveSpawnHandler(EntityMob entity, float scale){
-		if(!entity.getEntityData().getBoolean("boosted")){ 
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("pmhealth", (scale*0.3), 2));
+		// 0 means boosts have not been added
+		if(entity.getEntityData().getFloat("scale") == 0){ 
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("pmdamage", (scale*0.2), 1));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("pmspeed", (scale*0.03), 1));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.maxHealth).applyModifier(new AttributeModifier("pmhealth", (scale*0.2), 2));
 			entity.setHealth(entity.getMaxHealth());
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.attackDamage).applyModifier(new AttributeModifier("pmdamage", (scale*0.2), 2));
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.movementSpeed).applyModifier(new AttributeModifier("pmspeed", (scale*0.03), 2));
 			
 			double range = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).getBaseValue();
 			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).setBaseValue(range+(scale*5));
 			
-			if(entity instanceof EntityZombie)
+			if(entity instanceof EntityZombie){
 				entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.knockbackResistance).setBaseValue(scale*0.1);
-		
-			entity.getEntityData().setBoolean("boosted", true);
+				MobarmouryHandler.ZombieArmoury((EntityZombie)entity, scale);
+			}
+			if(entity instanceof EntitySkeleton){
+				MobarmouryHandler.SkeletonArmoury((EntitySkeleton)entity, scale);
+			}
+			if(entity instanceof EntityCreeper){
+			}
+			if(entity instanceof EntitySpider){	
+			}
+			entity.getEntityData().setFloat("scale", scale);
 		}
 	}
 	
