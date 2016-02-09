@@ -16,20 +16,21 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ProgressEventHandler {
 	
 	private List<EntityPlayerMP> players = new ArrayList<EntityPlayerMP>();
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void progessiveSpawnHandler(EntityJoinWorldEvent event){
 		if(!event.world.isRemote){
 			/*
 			 * Checks for players around the mobs
 			 */
 			if(event.entity instanceof EntityMob){
-				double range = ProgressiveMobs.checkRange;
+				double range = ConfigHandler.checkRange;
 				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(range, (range*0.5), range), null);
 				if(!list.isEmpty()){
 					for(int i=0; i < list.size(); i++){
@@ -64,13 +65,17 @@ public class ProgressEventHandler {
 	private float obtainPlayerTier(EntityPlayerMP player) {
 		float result = 0;
 		StatisticsFile file = player.getStatFile(); 
-		double scale = ProgressiveMobs.scale;
-		if(file.hasAchievementUnlocked(AchievementList.acquireIron))result += scale;
-		if(file.hasAchievementUnlocked(AchievementList.diamonds))result += scale;
-		if(file.hasAchievementUnlocked(AchievementList.enchantments))result += scale;
-		if(file.hasAchievementUnlocked(AchievementList.portal))result += scale;
-		if(file.hasAchievementUnlocked(AchievementList.theEnd2))result += scale;
-		if(file.hasAchievementUnlocked(AchievementList.killWither))result += scale;
+		if(file.hasAchievementUnlocked(AchievementList.acquireIron) && ConfigHandler.acquireIronAchieve)result += ConfigHandler.acquireIronScale;
+		if(file.hasAchievementUnlocked(AchievementList.diamonds) && ConfigHandler.diamondsAchieve)result += ConfigHandler.diamondsScale;
+		if(file.hasAchievementUnlocked(AchievementList.enchantments) && ConfigHandler.enchantmentsAchieve)result += ConfigHandler.enchantmentsScale;
+		if(file.hasAchievementUnlocked(AchievementList.portal) && ConfigHandler.portalAchieve)result += ConfigHandler.portalScale;
+		if(file.hasAchievementUnlocked(AchievementList.theEnd2) && ConfigHandler.theEnd2Achieve)result += ConfigHandler.theEnd2Scale;
+		if(file.hasAchievementUnlocked(AchievementList.killWither) && ConfigHandler.killWitherAchieve)result += ConfigHandler.killWitherScale;
+		//Extras
+		if(file.hasAchievementUnlocked(AchievementList.fullBeacon) && ConfigHandler.beaconAchieve)result += ConfigHandler.beaconScale;
+		if(file.hasAchievementUnlocked(AchievementList.potion) && ConfigHandler.potionAchieve)result += ConfigHandler.potionScale;
+		if(file.hasAchievementUnlocked(AchievementList.overkill) && ConfigHandler.overKillAchieve)result += ConfigHandler.overKillScale;
+		if(file.hasAchievementUnlocked(AchievementList.overpowered) && ConfigHandler.overPoweredAchieve)result += ConfigHandler.overPoweredScale;
 		
 		return result;
 	}
@@ -84,7 +89,7 @@ public class ProgressEventHandler {
 			entity.setHealth(entity.getMaxHealth());
 			
 			double range = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).getBaseValue();
-			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).setBaseValue(range+(scale*5));
+			entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.followRange).setBaseValue(range+(scale*3));
 			
 			if(entity instanceof EntityZombie){
 				entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.knockbackResistance).setBaseValue(scale*0.1);

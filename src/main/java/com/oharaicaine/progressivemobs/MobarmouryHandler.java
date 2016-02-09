@@ -22,7 +22,7 @@ public class MobarmouryHandler {
 
 	public static void SkeletonArmoury(EntitySkeleton skeleton, float scale){
 		ArmourSet(skeleton, scale);
-		WeaponSet(skeleton, scale);
+		if(skeleton.getSkeletonType() == 0)WeaponSet(skeleton, scale);
 	}
 	
 	private static void WeaponSet(EntityMob mob, float scale) {
@@ -55,7 +55,7 @@ public class MobarmouryHandler {
 				else if(result > 40 && result <= 70){//30
 					bow.addEnchantment(Enchantment.power, 1);
 				}
-				else if(result > 70 && result <= 90){//20j
+				else if(result > 70 && result <= 90){//20
 					bow.addEnchantment(Enchantment.flame, 1);
 				}
 				else if(result > 90){//10
@@ -63,7 +63,7 @@ public class MobarmouryHandler {
 					bow.addEnchantment(Enchantment.punch, 1);
 					bow.addEnchantment(Enchantment.flame, 1);
 				}
-				mob.setCurrentItemOrArmor(0, bow);
+				if(((EntitySkeleton)mob).getSkeletonType() == 0)mob.setCurrentItemOrArmor(0, bow);
 			}
 		}
 		

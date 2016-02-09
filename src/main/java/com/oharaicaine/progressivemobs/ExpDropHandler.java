@@ -13,7 +13,7 @@ public class ExpDropHandler {
 		if(event.entityLiving instanceof EntityMob){
 			EntityPlayerMP player = (EntityPlayerMP)event.getAttackingPlayer();
 			float scale = event.entityLiving.getEntityData().getFloat("scale");
-			if(scale > 0)event.setDroppedExperience((int) (event.getOriginalExperience()+Math.round(scale*0.3)));
+			if(scale > 0)event.setDroppedExperience((int) (event.getOriginalExperience()+Math.round(scale)));
 			
 		}
 	}
