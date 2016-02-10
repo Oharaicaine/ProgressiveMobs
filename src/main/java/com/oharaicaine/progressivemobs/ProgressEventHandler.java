@@ -12,6 +12,7 @@ import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatisticsFile;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -30,7 +31,7 @@ public class ProgressEventHandler {
 			 * Checks for players around the mobs
 			 */
 			if(event.entity instanceof EntityMob){
-				double range = ConfigHandler.checkRange;
+				double range = ConfigLoader.checkRange;
 				List list = event.world.getEntitiesInAABBexcluding(event.entity, event.entity.getEntityBoundingBox().expand(range, (range*0.5), range), null);
 				if(!list.isEmpty()){
 					for(int i=0; i < list.size(); i++){
@@ -65,17 +66,10 @@ public class ProgressEventHandler {
 	private float obtainPlayerTier(EntityPlayerMP player) {
 		float result = 0;
 		StatisticsFile file = player.getStatFile(); 
-		if(file.hasAchievementUnlocked(AchievementList.acquireIron) && ConfigHandler.acquireIronAchieve)result += ConfigHandler.acquireIronScale;
-		if(file.hasAchievementUnlocked(AchievementList.diamonds) && ConfigHandler.diamondsAchieve)result += ConfigHandler.diamondsScale;
-		if(file.hasAchievementUnlocked(AchievementList.enchantments) && ConfigHandler.enchantmentsAchieve)result += ConfigHandler.enchantmentsScale;
-		if(file.hasAchievementUnlocked(AchievementList.portal) && ConfigHandler.portalAchieve)result += ConfigHandler.portalScale;
-		if(file.hasAchievementUnlocked(AchievementList.theEnd2) && ConfigHandler.theEnd2Achieve)result += ConfigHandler.theEnd2Scale;
-		if(file.hasAchievementUnlocked(AchievementList.killWither) && ConfigHandler.killWitherAchieve)result += ConfigHandler.killWitherScale;
-		//Extras
-		if(file.hasAchievementUnlocked(AchievementList.fullBeacon) && ConfigHandler.beaconAchieve)result += ConfigHandler.beaconScale;
-		if(file.hasAchievementUnlocked(AchievementList.potion) && ConfigHandler.potionAchieve)result += ConfigHandler.potionScale;
-		if(file.hasAchievementUnlocked(AchievementList.overkill) && ConfigHandler.overKillAchieve)result += ConfigHandler.overKillScale;
-		if(file.hasAchievementUnlocked(AchievementList.overpowered) && ConfigHandler.overPoweredAchieve)result += ConfigHandler.overPoweredScale;
+		
+		for(Object[] obj : ConfigLoader.achievements.values()){
+			if(file.hasAchievementUnlocked((Achievement) obj[0]))result += (Double) obj[2];
+		}
 		
 		return result;
 	}

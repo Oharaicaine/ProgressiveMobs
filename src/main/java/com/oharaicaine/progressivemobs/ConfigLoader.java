@@ -14,71 +14,69 @@ import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-public class AchievementLoader {
+public class ConfigLoader {
 
-	public static String[] vanillaAchieves = new String[28];//27
+	public static String[] vanillaAchieves = new String[28];
 	public static String[] vanillaDefault = new String[7];
 	public static String[] moddedAchieves = new String[AchievementList.achievementList.size()];
 	
-	public static Map<String,Object[]> keys = new HashMap<String,Object[]>();
+	public static double checkRange = 128.0;
+	public static boolean forceAchievements = true;
+	
+	public static Map<String,Object[]> achievements = new HashMap<String,Object[]>();
 	
 	public static void load(Configuration config){
+		
 		List<String> vanillaDefaultList = new ArrayList<String>();
 		List<String> vanillaList = new ArrayList<String>();
 		List<String> moddedList = new ArrayList<String>();
 
-		for(int i = 0; i < 35; i++){//34
+		for(int i = 0; i < 34; i++){
 			Achievement ach = AchievementList.achievementList.get(i);
 			if(ach.equals(AchievementList.acquireIron)){
 				vanillaDefaultList.add(ach.statId+"= true, 1.0");
 			}else if(ach.equals(AchievementList.diamonds)){
 				vanillaDefaultList.add(ach.statId+"= true, 1.0");
 			}else if(ach.equals(AchievementList.enchantments)){
-				vanillaDefaultList.add(ach.statId+"= true, 1.0");
+				vanillaDefaultList.add(ach.statId+"= true, 0.5");
 			}else if(ach.equals(AchievementList.portal)){
 				vanillaDefaultList.add(ach.statId+"= true, 1.0");
 			}else if(ach.equals(AchievementList.theEnd2)){
 				vanillaDefaultList.add(ach.statId+"= true, 1.0");
 			}else if(ach.equals(AchievementList.killWither)){
-				vanillaDefaultList.add(ach.statId+"= true, 1.0");
+				vanillaDefaultList.add(ach.statId+"= true, 1.5");
 			}else if(ach.equals(AchievementList.overkill)){
-				vanillaDefaultList.add(ach.statId+"= true, 1.0");
+				vanillaDefaultList.add(ach.statId+"= true, 2.0");
 			}else{
 				vanillaList.add(ach.statId+"= false, 1.0");
 			}
-		}//34
-		for(int i = 35; i < AchievementList.achievementList.size(); i++){
+		}
+		for(int i = 34; i < AchievementList.achievementList.size(); i++){
 			Achievement ach = AchievementList.achievementList.get(i);
 			moddedList.add(ach.statId+"= false, 1.0");
 		}
 		config.load();
 		List<String> order = new ArrayList<String>();
-		Collections.addAll(order, "VanillaDefault", "Vanilla", "Modded");
+		Collections.addAll(order, "Progressive Mobs", "VanillaDefault", "Vanilla", "Modded");
+		
+		Property forceAchievementsProperty = config.get("Progressive Mobs", "Force Achievement unlock", true);
+		forceAchievementsProperty.comment = "Unlocking Achievements even when you don't have the required sub-achievements";
+		forceAchievements = forceAchievementsProperty.getBoolean(true);
+		
+		Property checkRangeProperty = config.get("Progressive Mobs", "Check Range", 128.0);
+		checkRangeProperty.comment = "The range mobs will check for players to determine their scaling";
+		checkRange = forceAchievementsProperty.getDouble(128.0);
+		
 		config.setCategoryPropertyOrder("Achievement", order);
-		Property defaultLoad = config.get("Achievement", "VanillaDefault", convertToStringArray(vanillaDefaultList));
-		Property vanillaLoad = config.get("Achievement", "Vanilla", convertToStringArray(vanillaList));
-		Property moddedLoad = config.get("Achievement", "Modded", convertToStringArray(moddedList));
+		config.addCustomCategoryComment("Achievement", "Enable/Disable achievements, Double(eg 1.0) is the scaling for each achievement. Range 0.1-10.0");
+		Property defaultLoad = config.get("Achievement", "VanillaDefault", convertListToArray(vanillaDefaultList));
+		Property vanillaLoad = config.get("Achievement", "Vanilla", convertListToArray(vanillaList));
+		Property moddedLoad = config.get("Achievement", "Modded", convertListToArray(moddedList));
 
 		populateMap(defaultLoad.getStringList());
 		populateMap(vanillaLoad.getStringList());
 		populateMap(moddedLoad.getStringList());
 		config.save();
-		
-		//0=id, 1=boolean, 2=double
-		/*String[] temp = load[0].split("=|,");
-		for(int k = 0; k < temp.length;k++){
-			System.out.println(temp[k]);
-		}*/
-		//booleans = organizeArray(ArrayUtils.toObject(Boolean.parseBoolean(temp)), 1);
-		/*String tp = temp[0];
-		booleans[0] = Boolean.parseBoolean(temp[0]);
-		organizeArray(ArrayUtils.toObject(scales), 1);
-		scales[0] = tryParse(temp[1]);
-		System.out.println(booleans[0]);j
-		System.out.println(scales[0]);*/
-		/*for(int j = 0;j< temp.length;j++){
-			System.out.println(temp[j]);
-		}*/
 	}
 	
 	private static void populateMap(String[] stringList) {
@@ -92,12 +90,12 @@ public class AchievementLoader {
 			str[1] = str[1].replaceAll("\\s+","");
 			str[2] = str[2].replaceAll("\\s+","");
 			if(Boolean.parseBoolean(str[1])){
-				keys.put(str[0], createArray(str[0], Boolean.parseBoolean(str[1]), Double.parseDouble(str[2])));
+				achievements.put(str[0], createArray(str[0], tryParseBoolean(str[1]), tryParseDouble(str[2])));
 			}
 		}
 	}
 
-	private static String[] convertToStringArray(List<String> array) {
+	private static String[] convertListToArray(List<String> array) {
 		String[] result = new String[array.size()];
 		for(int i = 0; i < array.size(); i++){
 			result[i] = array.get(i);
@@ -121,10 +119,9 @@ public class AchievementLoader {
 
 	private static Object[] createArray(String achId, boolean bool, double scale){
 		Object[] input = new Object[3];
-		
 		for(Achievement ach: AchievementList.achievementList){
 			if(ach.statId.equals(achId)){
-				input[0] = achId;
+				input[0] = ach;
 				input[1] = bool;
 				input[2] = scale;
 			}
@@ -139,13 +136,20 @@ public class AchievementLoader {
 		    return 1.0;
 		}
 	}
+	private static boolean tryParseBoolean(String text) {
+		try {
+			return Boolean.parseBoolean(text);
+		} catch (NumberFormatException e) {
+		    return false;
+		}
+	}
 	
-	private static Object[] organizeArray(Object[] array, int index){
+/*	private static Object[] organizeArray(Object[] array, int index){
 		Object[] result = new Object[array.length/index];
 		for(int i = 0;i < array.length; i++){
 			result[i] = array[(i*index)+index];
 		}
 		 return result;
-	}
+	}*/
 	
 }

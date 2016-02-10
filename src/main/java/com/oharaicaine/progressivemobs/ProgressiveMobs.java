@@ -13,20 +13,19 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = "0.3")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = "0.4")
 public class ProgressiveMobs {
 
-	public static Achievement overOverKill;
-	private Configuration config;
+	//public static Achievement overOverKill;
+	private static Configuration config;
 	
 	@Instance(Reference.MOD_ID)
 	public static ProgressiveMobs instance;
 	
 	@EventHandler
 	public void perInit(FMLPreInitializationEvent event){
-		overOverKill = new Achievement("achievement.overOverKill","overOverKill", -4, -2, Items.golden_sword, AchievementList.overkill).setSpecial().registerStat();
+		//overOverKill = new Achievement("achievement.overOverKill","overOverKill", -4, -2, Items.golden_sword, AchievementList.overkill).setSpecial().registerStat();
 		config = new Configuration(event.getSuggestedConfigurationFile(), "0.3");
-		ConfigHandler.init(config);
 	}
 	
 	@EventHandler
@@ -36,18 +35,12 @@ public class ProgressiveMobs {
 		MinecraftForge.EVENT_BUS.register(new LivingHurtHandler());
 		MinecraftForge.EVENT_BUS.register(new ExpDropHandler());
 		
-		if(ConfigHandler.forceAchievements){
-			MinecraftForge.EVENT_BUS.register(new AchievementForceHandler());
-		}else{
-			MinecraftForge.EVENT_BUS.register(new AchievementHandler());
-		}
-		
-		
+		MinecraftForge.EVENT_BUS.register(new AchievementHandler());
 	
 	}
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event){
-		AchievementLoader.load(config);
+		ConfigLoader.load(config);
 	}
 	
 	
