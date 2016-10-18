@@ -16,7 +16,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0.0"
-group= "insomnia.kitten.progressivemobs"
+group= "com.oharaicaine.progressivemobs"
 archivesBaseName = "progressivemobs"
 
 sourceCompatibility = targetCompatibility = "1.6"
