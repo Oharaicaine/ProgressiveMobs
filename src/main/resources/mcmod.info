@@ -1,16 +1,16 @@
 [
-{
+ {
   "modid": "progressivemobs",
   "name": "Progressive Mobs",
-  "description": "Mobs progress in difficulty as players unlock achievements",
+  "description": "Mobs progress in difficulty as players unlock achievements.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["Oharaicaine"],
-  "credits": "",
+  "authorList": ["Oharaicaine, InsomniaKitten"],
+  "credits": "Ported to Minecraft 1.10.2 by InsomniaKitten.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
-}
+ }
 ]
