@@ -1,4 +1,4 @@
-package insomnia.kitten.progressivemobs;
+package com.oharaicaine.progressivemobs;
 
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;

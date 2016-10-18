@@ -1,4 +1,4 @@
-package insomnia.kitten.progressivemobs;
+package com.oharaicaine.progressivemobs;
 
 public class Reference {
 

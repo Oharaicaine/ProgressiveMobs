@@ -1,4 +1,4 @@
-package insomnia.kitten.progressivemobs;
+package com.oharaicaine.progressivemobs;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.stats.Achievement;
